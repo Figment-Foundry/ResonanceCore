@@ -147,7 +147,8 @@
     <section class="wrap hero" aria-labelledby="hero-title">
       <div>
         <p class="eyebrow">ResonanceCore / Source-available</p>
-        <h1 id="hero-title">The build passed. <em>Tell the reviewer.</em></h1>
+        <h1 id="hero-title">Local messaging for <em>coding agents.</em></h1>
+        <p>The build passed. Tell the reviewer.</p>
         <p class="lead">ResonanceCore sends a message to a specific coding-agent session on the same machine. Find the live recipient, send to its current session, and let it read the message through its harness hook or the CLI.</p>
         <div class="actions">
           <a class="button" href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">Try the two-shell quickstart ↗</a>
@@ -188,7 +189,7 @@
         <h3>Read</h3>
         <div><p>The recipient drains its inbox, or its harness delivers the mail.</p><pre><code>agent-msg drain --as "$AGENT_MSG_ID"</code></pre></div>
       </article>
-      <figure class="diagram"><img src="media/session-pinning.svg" width="1200" height="600" loading="lazy" alt="The builder's send to session A is delivered. After the reviewer restarts as session B, a send still addressed to A is refused with session_replaced. Resolving the label again and sending to B is delivered."></figure>
+      <figure class="diagram"><img src="media/session-pinning.svg" width="1200" height="600" loading="lazy" alt="The builder's send to session A is delivered. After the reviewer restarts as session B, a send still addressed to A is refused with session_replaced. Resolving the label again and sending to B is delivered."><figcaption>When a reviewer restarts, it gets a new session ID. A send to the old ID is refused; resolve the label again before sending.</figcaption></figure>
       <p class="note-line">These are excerpts. Follow the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">quickstart</a> for the complete steps.</p>
     </section>
 
