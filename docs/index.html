@@ -84,6 +84,9 @@
     .tool-row p { margin: 0 0 .8rem; color: var(--ink-text); }
     pre { margin: 0; padding: 1rem; overflow-x: auto; background: var(--well); color: var(--ink); font: .8rem/1.65 var(--mono); }
     p code, li code, td code { padding: .05rem .3rem; background: var(--well); font: .85em var(--mono); }
+    .diagram { margin: 2rem 0 0; border: 1px solid var(--line); background: var(--paper); overflow-x: auto; }
+    .diagram img { display: block; width: 100%; min-width: 720px; height: auto; }
+    .diagram figcaption { padding: .7rem 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .78rem; }
     .note-line { margin: 1.2rem 0 0; color: var(--muted); font-size: .85rem; }
 
     .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 2.5rem 4rem; align-items: start; }
@@ -167,6 +170,7 @@
         <div><p class="eyebrow">How a message moves</p><h2 id="how-title">Resolve, send, read.</h2></div>
         <p>Every session joins a shared SQLite inbox under a label. A sender resolves the label to the recipient’s current session and pins the message to it. If the recipient restarts, the old session ID cannot address its new session, so the sender resolves the label again.</p>
       </div>
+      <figure class="diagram"><img src="media/message-flow.svg" width="1200" height="560" loading="lazy" alt="The builder resolves the reviewer label to its live session ID on the shared SQLite bus, sends a message pinned to that session, and the reviewer reads it with agent-msg drain or through its harness hook."></figure>
       <article class="tool-row">
         <span class="tool-index" aria-hidden="true">01</span>
         <h3>Resolve</h3>
@@ -184,6 +188,7 @@
         <h3>Read</h3>
         <div><p>The recipient drains its inbox, or its harness delivers the mail.</p><pre><code>agent-msg drain --as "$AGENT_MSG_ID"</code></pre></div>
       </article>
+      <figure class="diagram"><img src="media/session-pinning.svg" width="1200" height="600" loading="lazy" alt="The builder's send to session A is delivered. After the reviewer restarts as session B, a send still addressed to A is refused with session_replaced. Resolving the label again and sending to B is delivered."></figure>
       <p class="note-line">These are excerpts. Follow the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">quickstart</a> for the complete steps.</p>
     </section>
 
@@ -208,6 +213,7 @@ agent-msg capabilities</code></pre>
           <p>Idle delivery depends on the harness. Check the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/agent-msg/integrations/native-harnesses.md">native harness setup and support matrix</a> before you rely on it.</p>
         </div>
       </div>
+      <figure class="diagram"><img src="media/harness-support.svg" width="1200" height="730" loading="lazy" alt="Harness support in 0.6.0: Codex, Pi, OpenCode and T3 Code can wake an idle session; Claude Code can with an opt-in Channels launch; Kimi Code waits for the next prompt."><figcaption>The text version, with setup details, is the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/agent-msg/integrations/native-harnesses.md">native harness guide</a>.</figcaption></figure>
     </section>
 
     <section class="band" aria-labelledby="security-title">

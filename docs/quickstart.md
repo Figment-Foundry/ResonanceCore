@@ -64,6 +64,9 @@ selected output from an isolated test run and omits the session ID.
 - Confirm terminal A is still running the supervised reviewer shell and has
   drained its inbox once.
 - If the reviewer was restarted, resolve the label again before sending.
-  The old session ID cannot address the new incarnation.
+  The old session ID cannot address the new incarnation, and `send` refuses it
+  with `session_replaced`.
+
+  ![The builder's send to session A is delivered. After the reviewer restarts as session B, a send still addressed to A is refused with session_replaced. Resolving the label again and sending to B is delivered.](media/session-pinning.svg)
 - For native hooks and idle delivery, follow the
   [harness setup and support matrix](../agent-msg/integrations/native-harnesses.md).

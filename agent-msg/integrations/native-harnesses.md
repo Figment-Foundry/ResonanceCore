@@ -4,6 +4,8 @@ Resonance 0.6.0 shares exact session discovery, a durable bus, leased presence,
 session-pinned sends and bounded delivery across the installed harnesses. Native
 wake capabilities differ; installing a skill does not activate a receiver.
 
+![Harness support summary for 0.6.0. The table below is the full text version.](../../docs/media/harness-support.svg)
+
 | Harness | Ordinary configured launch | Idle delivery | Verification |
 | --- | --- | --- | --- |
 | Codex | Terminal hooks through the session service (plain `codex` daemon or `--no-daemon`), owner-configured initial idle binding or explicit queue binding | Existing bounded bridge | Real queue and Unix endpoint fixtures |

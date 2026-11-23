@@ -22,6 +22,10 @@ Start with the [quickstart](docs/quickstart.md). It uses Bash and a temporary
 bus and needs no provider account or model call. When both shells can exchange
 a message, use the integration guide to configure your coding harness.
 
+## How it works
+
+![The builder resolves the reviewer label to its live session ID on the shared SQLite bus, sends a message pinned to that session, and the reviewer reads it with agent-msg drain or through its harness hook.](docs/media/message-flow.svg)
+
 ## Guides and reference
 
 | If you want to… | Read |
@@ -31,6 +35,8 @@ a message, use the integration guide to configure your coding harness.
 | Configure Codex, Claude Code, Kimi, Pi, OpenCode, or T3 Code | [Native harness setup and support matrix](agent-msg/integrations/native-harnesses.md) |
 | Build or configure the native backend on Linux or Windows | [Go service guide](go/README.md) |
 | Understand what can access the bus | [Security boundary](SECURITY.md) |
+
+![Harness support in 0.6.0: Codex, Pi, OpenCode and T3 Code can wake an idle session; Claude Code can with an opt-in Channels launch; Kimi Code waits for the next prompt. The full table is in the native harness guide.](docs/media/harness-support.svg)
 
 Idle delivery depends on the harness. T3 Code uses a fixed doorbell turn for
 waiting mail. Its optional Codex integration reads T3's private SQLite schema.
