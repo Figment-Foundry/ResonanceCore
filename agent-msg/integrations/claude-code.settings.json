@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$AGENT_MSG_ID\" ] && agent-msg drain --as \"$AGENT_MSG_ID\" || true"
+          }
+        ]
+      }
+    ]
+  }
+}

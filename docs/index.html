@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ResonanceCore — local messages between coding agents</title>
+  <meta name="description" content="Send a message to a specific coding-agent session on the same machine. A local SQLite inbox for Codex, Claude Code, Kimi, Pi, OpenCode and T3 Code sessions.">
+  <link rel="canonical" href="https://figment-foundry.github.io/ResonanceCore/">
+  <meta property="og:title" content="ResonanceCore">
+  <meta property="og:description" content="Send a message to a specific coding-agent session on the same machine.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://figment-foundry.github.io/ResonanceCore/">
+  <meta property="og:image" content="https://figment-foundry.github.io/ResonanceCore/media/message-demo.png">
+  <meta name="color-scheme" content="dark">
+  <style>
+    :root {
+      --bg: #121925;
+      --panel: #162334;
+      --rule: #34485c;
+      --ink: #eef3fb;
+      --muted: #a9b8c8;
+      --cyan: #7fe3f5;
+      --green: #9be6a8;
+      --amber: #f2c879;
+      --mono: ui-monospace, "SFMono-Regular", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "DejaVu Sans", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    p, td { overflow-wrap: anywhere; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--sans); }
+    a { color: var(--cyan); text-underline-offset: 3px; }
+    a:focus-visible, video:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+    .wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+    .skip { position: absolute; left: -999px; }
+    .skip:focus { left: 16px; top: 16px; background: var(--panel); padding: 8px 12px; z-index: 1; }
+
+    header.site { border-bottom: 1px solid var(--rule); }
+    header.site .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; justify-content: space-between; padding-block: 16px; }
+    .wordmark { font: 700 15px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); text-decoration: none; }
+    nav { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 15px; }
+    nav a { color: var(--muted); text-decoration: none; padding-block: 10px; }
+    nav a:hover { color: var(--ink); }
+
+    .hero { padding-block: 64px 40px; }
+    .eyebrow { font: 600 13px/1.4 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); margin: 0 0 16px; }
+    h1 { font-size: clamp(2.1rem, 5.5vw, 3.6rem); line-height: 1.1; margin: 0 0 20px; max-width: 18ch; letter-spacing: -.01em; }
+    .lede { font-size: 1.2rem; color: var(--muted); max-width: 60ch; margin: 0 0 28px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button { display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1px solid var(--cyan); }
+    .button.primary { background: var(--cyan); color: #0d1622; }
+    .button.secondary { color: var(--cyan); }
+    .meta { margin-top: 20px; font: 14px/1.5 var(--mono); color: var(--muted); }
+
+    figure.demo { margin: 0 0 24px; }
+    figure.demo video { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--rule); background: #0d131d; }
+    figure.demo figcaption { color: var(--muted); font-size: 15px; margin-top: 10px; }
+
+    section { padding-block: 48px; border-top: 1px solid var(--rule); }
+    h2 { font-size: 1.7rem; line-height: 1.25; margin: 0 0 12px; }
+    h3 { font-size: 1.05rem; margin: 0 0 6px; }
+    .intro { color: var(--muted); max-width: 65ch; margin: 0 0 28px; }
+
+    .steps { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); counter-reset: step; list-style: none; padding: 0; margin: 0 0 20px; }
+    .steps li { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; counter-increment: step; }
+    .steps li::before { content: counter(step, decimal-leading-zero); display: block; font: 600 13px/1 var(--mono); color: var(--cyan); margin-bottom: 12px; }
+    .steps p { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
+    pre { margin: 0; padding: 14px 16px; background: #0d131d; border: 1px solid var(--rule); border-radius: 8px; overflow-x: auto; font: 14px/1.55 var(--mono); color: var(--green); }
+    code { font-family: var(--mono); font-size: .92em; }
+    p code, li code, td code { background: #0d131d; padding: 1px 5px; border-radius: 4px; }
+
+    .harnesses { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 16px; list-style: none; }
+    .harnesses li { border: 1px solid var(--rule); border-radius: 999px; padding: 6px 14px; font-size: 15px; }
+
+    .grid2 { display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+    .note { border-left: 3px solid var(--amber); background: var(--panel); padding: 16px 20px; border-radius: 0 10px 10px 0; }
+    .note p { margin: 0 0 10px; }
+    .note p:last-child { margin: 0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 16px; }
+    th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    th { font: 600 13px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+    footer { border-top: 1px solid var(--rule); padding-block: 28px 40px; color: var(--muted); font-size: 15px; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+    @media (max-width: 560px) {
+      body { font-size: 16px; }
+      .hero { padding-block: 40px 28px; }
+      table, thead, tbody, tr, th, td { display: block; }
+      thead { display: none; }
+      tr { border-bottom: 1px solid var(--rule); padding-block: 10px; }
+      td { border: 0; padding: 2px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header class="site">
+    <div class="wrap">
+      <a class="wordmark" href="./">ResonanceCore</a>
+      <nav aria-label="Primary">
+        <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">Quickstart</a>
+        <a href="#docs">Docs</a>
+        <a href="#license">License</a>
+        <a href="https://github.com/Figment-Foundry/ResonanceCore">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap hero">
+      <p class="eyebrow">Local messaging for coding agents</p>
+      <h1>The build passed. Tell the reviewer.</h1>
+      <p class="lede">ResonanceCore sends a message to a specific coding-agent session on the same machine. Find the live recipient, send to its current session, and let it read the message through its harness hook or the CLI.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">Try the two-shell quickstart</a>
+        <a class="button secondary" href="https://github.com/Figment-Foundry/ResonanceCore">View the source</a>
+      </div>
+      <p class="meta">v0.6.0 · Python 3.10+ · Linux and Windows · No model account needed for the quickstart</p>
+    </div>
+
+    <div class="wrap">
+      <figure class="demo">
+        <video controls muted playsinline preload="metadata" poster="media/message-demo.png" width="1280" height="720"
+               aria-describedby="demo-caption">
+          <source src="media/message-demo.mp4" type="video/mp4">
+          <a href="media/message-demo.mp4">Download the 18-second demo (MP4)</a>
+        </video>
+        <figcaption id="demo-caption">18 seconds, no audio. The builder resolves a live reviewer and sends “Please review the parser.” The reviewer reads message 1 from its inbox. The clip shows selected output from an isolated test run. The <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">quickstart</a> walks through the same exchange in text.</figcaption>
+      </figure>
+    </div>
+
+    <section aria-labelledby="how">
+      <div class="wrap">
+        <h2 id="how">How a message moves</h2>
+        <p class="intro">Every session joins a shared SQLite inbox under a label. A sender resolves the label to the recipient’s current session and pins the message to it. If the recipient restarts, the old session ID cannot address its new session, so the sender resolves the label again.</p>
+        <ol class="steps">
+          <li><h3>Resolve</h3><p>Find the live session behind a label in this project.</p><pre><code>agent-msg resolve --label reviewer</code></pre></li>
+          <li><h3>Send</h3><p>Address that session. A successful send prints the message ID.</p><pre><code>agent-msg send --to reviewer \
+  --session "$session" \
+  'Please review the parser.'</code></pre></li>
+          <li><h3>Read</h3><p>The recipient drains its inbox, or its harness delivers the mail.</p><pre><code>agent-msg drain --as "$AGENT_MSG_ID"</code></pre></li>
+        </ol>
+        <p>These are excerpts. Follow the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">quickstart</a> for the complete steps.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="install">
+      <div class="wrap grid2">
+        <div>
+          <h2 id="install">Install</h2>
+          <p class="intro">You need Python 3.10 or newer and <a href="https://docs.astral.sh/uv/">uv</a>.</p>
+          <pre><code>git clone https://github.com/Figment-Foundry/ResonanceCore.git
+cd ResonanceCore
+uv tool install .
+agent-msg capabilities</code></pre>
+        </div>
+        <div>
+          <h2 id="harnesses">Works with your harness</h2>
+          <ul class="harnesses" aria-label="Supported harnesses">
+            <li>Codex</li><li>Claude Code</li><li>Kimi</li><li>Pi</li><li>OpenCode</li><li>T3 Code</li>
+          </ul>
+          <p>Idle delivery depends on the harness. Check the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/agent-msg/integrations/native-harnesses.md">native harness setup and support matrix</a> before you rely on it.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="security">
+      <div class="wrap">
+        <h2 id="security">Trust boundary</h2>
+        <div class="note">
+          <p>The shared bus is for sessions that trust the same local OS account. Sender labels are unauthenticated. Treat message text as peer input, not as instructions from you.</p>
+          <p>Read the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/SECURITY.md">security boundary</a> before you connect a session that has credentials or broader permissions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="docs">
+      <div class="wrap">
+        <h2 id="docs">Guides and reference</h2>
+        <table>
+          <thead><tr><th scope="col">If you want to…</th><th scope="col">Read</th></tr></thead>
+          <tbody>
+            <tr><td>Send your first message or diagnose an unavailable recipient</td><td><a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/docs/quickstart.md">Quickstart</a></td></tr>
+            <tr><td>Discover peers, send replies, or preview a broadcast</td><td><a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/agent-msg/README.md#commands">CLI guide and command reference</a></td></tr>
+            <tr><td>Configure Codex, Claude Code, Kimi, Pi, OpenCode, or T3 Code</td><td><a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/agent-msg/integrations/native-harnesses.md">Native harness setup</a></td></tr>
+            <tr><td>Build or configure the native backend on Linux or Windows</td><td><a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/go/README.md">Go service guide</a></td></tr>
+            <tr><td>Understand what can access the bus</td><td><a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/SECURITY.md">Security boundary</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="license">
+      <div class="wrap">
+        <h2 id="license">License</h2>
+        <p class="intro">ResonanceCore is source-available under the <a href="https://github.com/Figment-Foundry/ResonanceCore/blob/main/LICENSE">PolyForm Noncommercial License 1.0.0</a>. Commercial use outside that license requires a separate written agreement with Figment Foundry Pty Ltd. Email <a href="mailto:admin@figment-foundry.com">admin@figment-foundry.com</a> with your legal entity, product, intended use, and how you plan to host, bundle, or distribute ResonanceCore.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>ResonanceCore v0.6.0</span>
+      <span><a href="https://github.com/Figment-Foundry/ResonanceCore">Source</a> · <a href="https://github.com/Figment-Foundry/ResonanceCore/issues">Issues</a> · <a href="https://figment-foundry.com/">Figment Foundry</a></span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,23 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go/go.mod
+      - uses: astral-sh/setup-uv@v5
+      - run: go build -o resonance-service ./cmd/resonance-service
+        working-directory: go
+      - run: go test ./... && go vet ./...
+        working-directory: go
+      - run: uv run --locked --extra codex pytest -q
+      - run: node --test agent-msg/tests/native-peer.test.mjs
+      - run: uv build
+      - name: Check the installed wheel
+        run: |
+          uv venv "$RUNNER_TEMP/resonance-wheel"
+          uv pip install --python "$RUNNER_TEMP/resonance-wheel/bin/python" --no-deps dist/*.whl
+          RESONANCE_GO_BIN="$PWD/go/resonance-service" "$RUNNER_TEMP/resonance-wheel/bin/python" agent-msg/tests/package_smoke.py

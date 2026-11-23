@@ -1,0 +1,17 @@
+# agent-msg injection hook for Kimi Code CLI.
+#
+# VERIFIED against Kimi CLI 0.38.0 official hooks docs
+# (https://moonshotai.github.io/kimi-cli/en/customization/hooks.html):
+# - Hooks are defined in ~/.kimi/config.toml using [[hooks]] arrays with
+#   event/command/matcher/timeout fields; UserPromptSubmit is one of the
+#   13 supported lifecycle events ("Before user input is processed").
+# - On exit code 0, non-empty stdout is added to context; empty stdout
+#   injects nothing. Failures are fail-open.
+#
+# Install: merge into .kimi/config.toml (project) or ~/.kimi/config.toml.
+# Check configured hooks inside a kimi session with /hooks.
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = '[ -n "$AGENT_MSG_ID" ] && agent-msg drain --as "$AGENT_MSG_ID" || true'
+timeout = 10

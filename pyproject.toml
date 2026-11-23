@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "resonance-agent-msg"
+version = "0.6.0"
+description = "Local addressed agent messages and native harness delivery"
+requires-python = ">=3.10"
+license = "PolyForm-Noncommercial-1.0.0"
+license-files = ["LICENSE"]
+dependencies = []
+
+[project.optional-dependencies]
+codex = ["websockets>=15,<18"]
+
+[project.scripts]
+agent-msg = "agent_msg:main"
+agent-msg-codex = "codex_bridge:main"
+agent-msg-desktop = "desktop_attachment:main"
+agent-msg-terminal = "terminal_session:main"
+agent-msg-native = "native_delivery:main"
+agent-msg-native-control = "native_delivery:control_main"
+agent-msg-harness = "harness_hooks:main"
+agent-msg-claude-channel = "claude_channel:main"
+agent-msg-service = "resonance_service:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.setuptools]
+package-dir = {"" = "agent-msg"}
+py-modules = ["agent_msg", "agent_directory", "thread_registry", "secure_session", "secure_mcp", "agent_broadcast", "agent_session", "codex_bridge", "codex_rpc", "codex_queue", "secure_broker", "desktop_attachment", "runtime_mailbox", "terminal_session", "native_delivery", "t3_delivery", "harness_hooks", "claude_channel", "resonance_service"]

@@ -1,0 +1,30 @@
+# agent-msg injection hook for OpenAI Codex CLI.
+#
+# VERIFIED against Codex CLI 0.149.1 and the official hooks reference
+# (https://developers.openai.com/codex/hooks):
+# - Codex uses the Claude-style NESTED hook schema, not a flat
+#   "[[hooks]] event=..." table. Inline TOML form lives under
+#   [[hooks.<Event>]] with an inner [[hooks.<Event>.hooks]] array of
+#   {type, command} handlers.
+# - On UserPromptSubmit, plain text on stdout is added as extra
+#   developer context; empty stdout injects nothing. Exit code 2 blocks
+#   the prompt, so we guard with "|| true" to never fail the turn.
+# - matcher is ignored for UserPromptSubmit.
+#
+# Install: merge this table into .codex/config.toml (project) or
+# ~/.codex/config.toml (user). If both hooks.json and inline [hooks]
+# exist in the same layer Codex warns -- pick one style per layer.
+# NOTE: Codex requires trust review before hooks run. Non-managed hooks
+# must be approved via /hooks in a Codex session, or they are silently
+# skipped.
+#
+# On older Codex releases hooks may need enabling with:
+#   [features]
+#   hooks = true
+
+[[hooks.UserPromptSubmit]]
+
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = '[ -n "$AGENT_MSG_ID" ] && agent-msg drain --as "$AGENT_MSG_ID" || true'
+timeout = 10

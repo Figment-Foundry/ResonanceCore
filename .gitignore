@@ -1,0 +1,8 @@
+.superpowers/
+.venv/
+__pycache__/
+.agent-msg/
+*.egg-info/
+build/
+dist/
+.pytest_cache/

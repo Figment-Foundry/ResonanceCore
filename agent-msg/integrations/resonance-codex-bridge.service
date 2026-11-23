@@ -1,0 +1,15 @@
+[Unit]
+Description=Resonance message delivery to registered Codex threads
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/resonancecore/codex-bridge.env
+ExecStart=/path/to/ResonanceCore/.venv/bin/agent-msg-codex --db ${RESONANCE_BUS_DB} run --interval 2
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+NoNewPrivileges=true
+UMask=0077
+
+[Install]
+WantedBy=default.target
