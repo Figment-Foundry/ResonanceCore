@@ -73,8 +73,14 @@ def test_claude_channel_uses_current_hook_not_stale_mcp_environment(native, monk
         attachment.close()
 
 
-def test_model_process_cannot_fabricate_native_hook_attachment(native):
+def test_model_process_cannot_fabricate_native_hook_attachment(native, monkeypatch):
     root, _ = native
+    # An installed host that is not this process's parent; independent of the machine's PATH.
+    bindir = root / 'bin'
+    bindir.mkdir()
+    (bindir / 'claude').write_text('#!/bin/sh\n')
+    (bindir / 'claude').chmod(0o755)
+    monkeypatch.setenv('PATH', str(bindir) + os.pathsep + os.environ.get('PATH', ''))
     with pytest.raises(ValueError, match='native_host_required'):
         hooks.hook(dict(session_id=str(uuid.uuid4()), cwd=str(root), hook_event_name='SessionStart'), 'claude', str(root/'bus.db'))
 
